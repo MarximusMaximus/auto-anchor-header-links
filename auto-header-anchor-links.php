@@ -1,14 +1,12 @@
 <?php
 /*
 Plugin Name: Auto Header Anchor Links
-Plugin URI: https://www.themightymo.com/
 Description: Dynamically adds anchor links when you hover over any header tag (H1, H2, H3, etc.)
-Author: themightymo
-Author URI: https://www.themightymo.com
+Author: marximusmaximus & themightymo
 Version: 1.2.2
 License: GPLv2 or later
-Text Domain: themightymo
-GitHub Plugin URI: themightymo/auto-anchor-header-links
+Text Domain: marximusmaximus
+GitHub Plugin URI: marximusmaximus/auto-anchor-header-links
 */
 
 /*
@@ -35,21 +33,20 @@ Copyright 2018 The Mighty Mo! Design Co. LLC
 */
 function auto_id_headings( $content ) {
 
-	$content = preg_replace_callback( '/\<(h[1-6])((.*?(?= id))?(?: id=[\'\"](.*)[\'\"]){0,1}(.*?))\>(.*)(<\/h[1-6]>)/i', function( $matches ) {
+	$content = preg_replace_callback( '/\<(h[1-6])(?:(.*?(?= id))?(?: id=[\'\"](.*)[\'\"]){0,1}(.*?))\>(.*)(?:<\/h[1-6]>)/i', function( $matches ) {
 		// 0: full string
 		// 1: h# without <>
-		// 2: args to h#
+		// 2: args to h# (before 'id')
 		// 3: id of h# if present
-		// 4: additional args to h#
+		// 4: additional args to h# (after 'id')
 		// 5: h# displayed text
-		// 6: closing h# with <>
-		if ( $matches[3] = '' ) {
-			$id = sanitize_title( $matches[5] );
+		if ( $matches[3] === null || trim($matches[3]) == '' ) {
+			$id = sanitize_title_with_dashes( $matches[5] );
 		} else {
 			$id = $matches[3];
 		}
 		$heading_link = '<a href="#' . $id . '" class="heading-link"><i class="fa fa-link"></i></a>';
-		$matches[0] = '<' . $matches[1] . $matches[2] . ' id="' . $id . '"' . $matches[4] . '>' . $heading_link . $matches[5] . $matches[6];
+		$matches[0] = '<' . $matches[1] . $matches[2] . ' id="' . $id . '"' . $matches[4] . '>' . $matches[5] . $heading_link . '</' . $matches[1] . '>';
 
 		return $matches[0];
 	}, $content );
